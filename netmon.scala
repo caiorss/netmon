@@ -52,31 +52,6 @@ object NetInfo{
     }
   }
 
-  def checkHTTP(hostname: String)(handler: (Boolean, String) => Unit) = { 
-    val fut = Future{checkHTTPSync(hostname)}
-    try {
-      Await.result(fut, 2.second)
-      handler(true, "Connection OK")
-    } catch {
-      case ex: java.net.UnknownHostException
-          => try {
-            // address of www.google.com = 216.58.222.100
-            if(isPortOpen("216.58.222.100", 80))
-              handler(false, "Error: DNS Failure\nbut connection works (can connect to 216.58.222.100)\ntry changing DSN")
-            else 
-              handler(false, "Error: DNS Failure")
-          } catch {
-            case ex: java.net.SocketException
-                => handler(false, "Network is unreachable (connect failed) + DNS Failure")
-          }
-      case ex: java.net.SocketException
-          => handler(false, "Network is unreachable (connect failed)")
-      case ex: java.util.concurrent.TimeoutException
-          => handler(false, "Error: Connection very slow, timeout exceeded")
-    }
-  }  
-
-
   def checkHTTPSync(hostname: String) =  {
     var is: java.io.InputStream = null  
     val c = new java.net.URL("http://" + hostname).openConnection()
@@ -94,6 +69,31 @@ object NetInfo{
       if(is != null) is.close()
     }
   }
+
+  def checkHTTP(hostname: String, address: String)(handler: (Boolean, String) => Unit) = { 
+    val fut = Future{checkHTTPSync(hostname)}
+    try {
+      Await.result(fut, 2.second)
+      handler(true, "Connection OK")
+    } catch {
+      case ex: java.net.UnknownHostException
+          => try {
+            // address of www.google.com = 216.58.222.100
+            if(isPortOpen(address, 80))
+              handler(false, s"Error: DNS Failure\nbut connection works (can connect to $address)\ntry changing DSN")
+            else 
+              handler(false, "Error: DNS Failure")
+          } catch {
+            case ex: java.net.SocketException
+                => handler(false, "Network is unreachable (connect failed) + DNS Failure")
+          }
+      case ex: java.net.SocketException
+          => handler(false, "Network is unreachable (connect failed)")
+      case ex: java.util.concurrent.TimeoutException
+          => handler(false, "Error: Connection very slow, timeout exceeded")
+    }
+  }  
+
 
   def getInterfaces(): Map[String,java.net.InetAddress] = {
     import java.net.InetAddress
@@ -196,7 +196,12 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
   }
 }
 
-object Main{ 
+object Main{
+  // Known hostname that provides HTTP service 
+  val probeHOST  = "www.google.com"
+  // Known hostname's IP address 
+  val probeADDR  = "216.58.222.100"
+
   val iconOnline  =
     Utils.getResourceImage("/resources/network-online.jpg", getClass())
 
@@ -212,7 +217,7 @@ object Main{
     // Run action every 2000 milliseconds or 2 seconds 
     Utils.runEvery(2000){
       val time = new java.util.Date()
-      NetInfo.checkHTTP("www.google.com"){ case (status, msg) =>
+      NetInfo.checkHTTP(probeHOST, probeADDR){ case (status, msg) =>
         val statusMsg = msg + "\n Last Update : " + time.toString()
         disp.display (statusMsg)
         disp.setTrayToolTip(statusMsg)
