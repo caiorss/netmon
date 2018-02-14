@@ -14,7 +14,7 @@ object Utils{
       java.lang.Thread.sleep(period)
     }
 
-  def getResourceImage(file: String, cls: Class[_]) = {  
+    def getResourceImage(file: String, cls: Class[_]): java.awt.Image = {
     val uri = cls.getResource(file)
     assert(uri != null, s"Error resource file $file not found")
     java.awt.Toolkit.getDefaultToolkit().getImage(uri)
