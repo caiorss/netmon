@@ -55,6 +55,24 @@ def checkDNS() =
 //   // Google's www.google.com 
 //   isPortOpen("216.58.222.100", 80)
 
+def isPortOpen(address: String, port: Int, timeout: Int = 1000) = {
+  import java.net.Socket
+  import java.net.InetSocketAddress
+  try {
+    val sock = new Socket()
+    sock.connect(new InetSocketAddress(address, port), timeout)
+    sock.close()
+    true
+  } catch {
+    // Connection refused exception
+    case (ex: java.net.ConnectException)
+        => false
+    case (ex: java.net.SocketTimeoutException)
+        => false
+    case ex: Throwable => throw ex
+  }
+}
+
 
 def checkHTTPSync(hostname: String) =  {
   var is: java.io.InputStream = null  
