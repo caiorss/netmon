@@ -130,15 +130,28 @@ object NetInfo{
 
 }
 
-class Display extends javax.swing.JFrame{
-  private val out = new javax.swing.JTextArea()
+class Display(ico: java.awt.Image) extends javax.swing.JFrame{
+  private val out      = new javax.swing.JTextArea()
+  private val tray     = java.awt.SystemTray.getSystemTray()
+  private val toolkit  = java.awt.Toolkit.getDefaultToolkit()
+  private val popuMenu = new java.awt.PopupMenu()
+  private val icon     = new java.awt.TrayIcon(ico)
+
   init()
   private def init(){
+    val frame = this
+
     out.setEditable(false)
 
-    val frame = this
+    icon.setToolTip("Network Status Monitoring")
+    tray.add(icon)
+    icon.setImageAutoSize(true)
+
+    frame.add(popuMenu)
+
     frame.setTitle("Internet Connection Status")
     frame.setSize(400, 120)
+    frame.setIconImage(ico)
     // frame.setLayout(new java.awt.FlowLayout())
     frame.add(new javax.swing.JScrollPane(out))
     frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE)
@@ -148,6 +161,24 @@ class Display extends javax.swing.JFrame{
   }
   def display(msg: String) =
     out.setText(msg)
+
+  def showInfo(title: String, message: String){
+    icon.displayMessage(title, message,  java.awt.TrayIcon.MessageType.INFO)
+  }
+  def showError(title: String, message: String){
+    icon.displayMessage(title, message,  java.awt.TrayIcon.MessageType.ERROR)
+  }
+  def showWarning(title: String, message: String){
+    icon.displayMessage(title, message,  java.awt.TrayIcon.MessageType.WARNING)
+  }
+
+  def setTrayToolTip(text: String) =
+    icon.setToolTip(text)
+
+  def setIcon(img: java.awt.Image) = {
+    this.setIconImage(img)
+    this.icon.setImage(img)
+  }
 }
 
 object Main{ 
