@@ -1,4 +1,5 @@
-package netmon 
+package netmon
+
 
 import scala.concurrent.Future
 import concurrent.ExecutionContext.Implicits.global
@@ -6,7 +7,7 @@ import scala.util.{Success, Failure}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-
+/** General utility functions */ 
 object Utils{
   def runEvery(period: Int)(action: => Unit) =
     while(true){
@@ -31,6 +32,7 @@ object Utils{
   
 }
 
+/** Network Information Module */
 object NetInfo{
 
   /** Returns true if TCP port from a given address is open */
@@ -132,7 +134,7 @@ object NetInfo{
 
 }
 
-
+/** Main Graphical User Inteface */ 
 class Display(ico: java.awt.Image) extends javax.swing.JFrame{
   private val out      = new javax.swing.JTextArea()
   private val tray     = java.awt.SystemTray.getSystemTray()
@@ -145,7 +147,6 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
     val frame = this
 
     out.setEditable(false)
-
 
     frame.setTitle("Internet Connection Status")
     frame.setSize(400, 120)
@@ -196,6 +197,7 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
   }
 }
 
+/** Program Entry Point */
 object Main{
   // Known hostname that provides HTTP service 
   val probeHOST  = "www.google.com"
