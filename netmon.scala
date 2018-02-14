@@ -203,18 +203,30 @@ object Main{
     Utils.getResourceImage("/resources/network-offline.png", getClass())
 
   def main(args: Array[String]) = {
-    val disp = new Display()
-    disp.setIconImage(iconOnline)
+    val disp = new Display(iconOnline)
+    // disp.setIconImage(iconOnline)
 
-    // Run action every 2000 milliseconds or 
+    var onlineStatus = true
+
+    // Run action every 2000 milliseconds or 2 seconds 
     Utils.runEvery(2000){
       val time = new java.util.Date()
       NetInfo.checkHTTP("www.google.com"){ case (status, msg) =>
-        disp.display (msg + "\n Last Update : " + time.toString())
+        val statusMsg = msg + "\n Last Update : " + time.toString()
+        disp.display (statusMsg)
+        disp.setTrayToolTip(statusMsg)
         if(status)
-          disp.setIconImage(iconOnline)
+          disp.setIcon(iconOnline)
         else
-          disp.setIconImage(iconOffline)
+          disp.setIcon(iconOffline)
+
+        // if(onlineStatus && status == true){
+        //   disp.showInfo("Connection Status", "Online - Connection OK.")
+        //   onlineStatus = true
+        // } else{
+        //   disp.showInfo("Connection Status", "Offile - Connection Failed")
+        //   onlineStatus = false
+        // }
       }
     }
   }
