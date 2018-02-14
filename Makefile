@@ -1,11 +1,12 @@
 all: run
-
 uber: bin/netmon-uber.jar 
 pgd:  bin/netmon-guard.jar
 
-bin/netmon.jar: netmon.scala
+src := src/netmon.scala src/netmon-main.scala
+
+bin/netmon.jar: $(src)
 	mkdir -p bin 
-	fsc netmon.scala -d bin/netmon.jar 
+	fsc $(src)  -d bin/netmon.jar 
 
 run: bin/netmon.jar
 	scala bin/netmon.jar
