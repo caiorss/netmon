@@ -57,7 +57,8 @@ object NetInfo{
     }
   }  
 
-  def isPortOpen(address: String, port: Int, timeout: Int = 1000) = {
+  /** Returns true if TCP port from a given address is open */
+  def isPortOpen(address: String, port: Int, timeout: Int = 1000): Boolean = {
     import java.net.Socket
     import java.net.InetSocketAddress
     try {
