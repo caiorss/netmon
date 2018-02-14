@@ -33,6 +33,25 @@ object Utils{
 
 object NetInfo{
 
+  /** Returns true if TCP port from a given address is open */
+  def isPortOpen(address: String, port: Int, timeout: Int = 1000): Boolean = {
+    import java.net.Socket
+    import java.net.InetSocketAddress
+    try {
+      val sock = new Socket()
+      sock.connect(new InetSocketAddress(address, port), timeout)
+      sock.close()
+      true
+    } catch {
+      // Connection refused exception
+      case (ex: java.net.ConnectException)
+          => false
+      case (ex: java.net.SocketTimeoutException)
+          => false
+      case ex: Throwable => throw ex
+    }
+  }
+
   def checkHTTP(hostname: String)(handler: (Boolean, String) => Unit) = { 
     val fut = Future{checkHTTPSync(hostname)}
     try {
@@ -57,24 +76,6 @@ object NetInfo{
     }
   }  
 
-  /** Returns true if TCP port from a given address is open */
-  def isPortOpen(address: String, port: Int, timeout: Int = 1000): Boolean = {
-    import java.net.Socket
-    import java.net.InetSocketAddress
-    try {
-      val sock = new Socket()
-      sock.connect(new InetSocketAddress(address, port), timeout)
-      sock.close()
-      true
-    } catch {
-      // Connection refused exception
-      case (ex: java.net.ConnectException)
-          => false
-      case (ex: java.net.SocketTimeoutException)
-          => false
-      case ex: Throwable => throw ex
-    }
-  }
 
   def checkHTTPSync(hostname: String) =  {
     var is: java.io.InputStream = null  
@@ -163,7 +164,7 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
     var flag = false
 
     val listener = new java.awt.event.ActionListener(){
-      def actionPerformed(event: java.awt.event.ActionEvent){
+      def actionPerformed(event: java.awt.event.ActionEvent){       
         flag = !flag
         frame.setVisible(flag)
       }
