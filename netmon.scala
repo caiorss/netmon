@@ -1,3 +1,5 @@
+package netmon 
+
 import scala.concurrent.Future
 import concurrent.ExecutionContext.Implicits.global
 import scala.util.{Success, Failure}
