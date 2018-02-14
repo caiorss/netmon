@@ -214,7 +214,8 @@ object Main{
     val disp = new Display(iconOnline)
     // disp.setIconImage(iconOnline)
 
-    var onlineStatus = true
+    // State is true for Online and false for offline 
+    var state = true 
 
     // Run action every 2000 milliseconds or 2 seconds 
     Utils.runEvery(2000){
@@ -223,18 +224,23 @@ object Main{
         val statusMsg = msg + "\n Last Update : " + time.toString()
         disp.display (statusMsg)
         disp.setTrayToolTip(statusMsg)
-        if(status)
-          disp.setIcon(iconOnline)
-        else
-          disp.setIcon(iconOffline)
+          
+        // println("state = " + state)
 
-        // if(onlineStatus && status == true){
-        //   disp.showInfo("Connection Status", "Online - Connection OK.")
-        //   onlineStatus = true
-        // } else{
-        //   disp.showInfo("Connection Status", "Offile - Connection Failed")
-        //   onlineStatus = false
-        // }
+        // Mealy's State Machine
+        if(status){
+          if(!state){
+            state = true
+            disp.setIcon(iconOnline)
+            disp.showInfo("Connection Status", "Online")
+            println("Connection Status")
+          }
+        } else if(state) {
+          state = false
+          disp.setIcon(iconOffline)
+          disp.showError("Connection Status", "Offline")
+          println("Connection Status")
+        }
       }
     }
   }
