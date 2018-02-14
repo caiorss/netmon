@@ -131,6 +131,7 @@ object NetInfo{
 
 }
 
+
 class Display(ico: java.awt.Image) extends javax.swing.JFrame{
   private val out      = new javax.swing.JTextArea()
   private val tray     = java.awt.SystemTray.getSystemTray()
@@ -144,11 +145,6 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
 
     out.setEditable(false)
 
-    icon.setToolTip("Network Status Monitoring")
-    tray.add(icon)
-    icon.setImageAutoSize(true)
-
-    frame.add(popuMenu)
 
     frame.setTitle("Internet Connection Status")
     frame.setSize(400, 120)
@@ -158,8 +154,25 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
     frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE)
     frame.setBackground(java.awt.Color.CYAN)
     frame.setResizable(false)
-    frame.setVisible(true)
+
+    icon.setToolTip("Network Status Monitoring")
+    tray.add(icon)
+    icon.setImageAutoSize(true)
+    frame.add(popuMenu)
+
+    var flag = false
+
+    val listener = new java.awt.event.ActionListener(){
+      def actionPerformed(event: java.awt.event.ActionEvent){
+        flag = !flag
+        frame.setVisible(flag)
+      }
+    }
+    icon.addActionListener(listener)
+
+    //frame.setVisible(true)
   }
+
   def display(msg: String) =
     out.setText(msg)
 
