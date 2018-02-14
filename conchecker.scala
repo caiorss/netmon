@@ -92,6 +92,13 @@ def checkHTTPSync(hostname: String) =  {
   }
 }
 
+// case class NetworkStatusHandler(
+//   NetworkOK:           String => Unit,
+//   NetwrokDNSFailLure:  String => Unit,
+//   NetworkUnreachable : String => Unit,
+// )
+
+
 def checkHTTP(hostname: String)(handler: (Boolean, String) => Unit) = { 
   val fut = Future{checkHTTPSync(hostname)}
   try {
@@ -99,7 +106,16 @@ def checkHTTP(hostname: String)(handler: (Boolean, String) => Unit) = {
     handler(true, "Connection OK")
   } catch {
     case ex: java.net.UnknownHostException
-        => handler(false, "Error: DNS Failure")
+        => try {
+          // address of www.google.com = 216.58.222.100
+          if(isPortOpen("216.58.222.100", 80))
+            handler(false, "Error: DNS Failure\nbut connection works (can connect to 216.58.222.100)\ntry changing DSN")
+          else 
+            handler(false, "Error: DNS Failure")
+        } catch {
+          case ex: java.net.SocketException
+              => handler(false, "Network is unreachable (connect failed) + DNS Failure")
+        }
     case ex: java.net.SocketException
         => handler(false, "Network is unreachable (connect failed)")
     case ex: java.util.concurrent.TimeoutException
@@ -136,13 +152,19 @@ def runEvery(period: Int)(action: => Unit) =
   }
 
 
-def getResourceImage(file: String, cls: Class[_]) = {
-  java.awt.Toolkit.getDefaultToolkit().getImage(cls.getResource(file))
+def getResourceImage(file: String, cls: Class[_]) = {  
+  val uri = cls.getResource(file)
+  assert(uri != null, s"Error resource file $file not found")
+  java.awt.Toolkit.getDefaultToolkit().getImage(uri)
 }
 
+// val iconOnline  = getResourceImage("/resources/network-online.jpg", getClass())
+// val iconOffline = getResourceImage("/resources/network-error.png", getClass())
 
 val iconOnline  = getResourceImage("/resources/network-online.jpg", getClass())
-val iconOffline = getResourceImage("/resources/network-error.png", getClass())
+val iconOffline = getResourceImage("/resources/network-offline.png", getClass())
+
+println("Icon = " + iconOnline)
 
 val disp = new Display()
 disp.setIconImage(iconOnline)
