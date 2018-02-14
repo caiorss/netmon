@@ -1,0 +1,14 @@
+* Netmon - Cross Platform Internet / Network Monitoring Application 
+
+*What is it?*
+
+It is small and simple open-source and cross-platform graphical app
+for monitoring internet connection. This program pools an known
+internet address (www.google.com and the address of this host name
+216.58.222.100) in a regular time interval to check the connection
+status. While Windows has this functionality, this application
+provides more feedback about the network status, for instance, it can
+diagnose the case when the network is working, but the DNS is failing.
+
+
+
