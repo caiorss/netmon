@@ -8,6 +8,10 @@ bin/netmon.jar: $(src)
 	mkdir -p bin 
 	fsc $(src)  -d bin/netmon.jar 
 
+force: $(src)
+	mkdir -p bin 
+	scalac $(src)  -d bin/netmon.jar 
+
 run: bin/netmon.jar
 	scala bin/netmon.jar
 
