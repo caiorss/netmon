@@ -1,4 +1,5 @@
 * Netmon - Cross Platform Internet / Network Monitoring Application 
+** Overview 
 
 *What is it?*
 
@@ -8,7 +9,78 @@ internet address (www.google.com and the address of this host name
 216.58.222.100) in a regular time interval to check the connection
 status. While Windows has this functionality, this application
 provides more feedback about the network status, for instance, it can
-diagnose the case when the network is working, but the DNS is failing.
+diagnose the case when the network is working, but the DNS is
+failing. 
+
+Features: 
+ 
+ - Small and cross platform network connection status. 
+
+Screenshots: 
+
+ - Tray icon when the computer is online 
+
+[[file:images/network-online.png][file:images/network-online.png]]
+
+ - Tray icon when the computer is offline 
+
+[[file:images/network-online.png][file:images/network-offline.png]] 
+
+When the user clicks on the tray icon it shows a window with more
+detailed information about the connection failure. 
+
+To run the application it is only necessary to click at the uber-jar
+file. 
+
+** Build Instructions
+
+This app doesn't have any third party dependency, except Scala runtime
+library and the [[http://wwww.github.com/caiorss/jarget][jarget]] application used to build the app uber-jar. 
+
+Assuming that jarget is in the path variable, run =make force && make pgd=  
+
+ - The comand make force, forces the compilation and make bundles the
+   app with scala runtime and optmizes the jar file reducing its size.
+
+#+BEGIN_SRC sh 
+  $ make force && make pgd
+
+  mkdir -p bin
+  scalac src/netmon.scala src/netmon-main.scala  -d bin/netmon.jar
+  jarget uber -scala -o bin/netmon-uber.jar -m bin/netmon.jar -r resources
+  Built file:  bin/netmon-uber.jar ok
+  Run it with: $ java -jar bin/netmon-uber.jar
+  java -jar proguard.jar @config.pro
+  ProGuard, version 5.3.3
+  Reading input...
+  Reading program jar [/home/archbox/Documents/projects/netmon.scala/bin/netmon-uber.jar]
+  Reading library jar [/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-0.b14.fc26.x86_64/jre/lib/rt.jar]
+  Initializing...
+  Note: scala.Enumeration accesses a field 'MODULE$' dynamically
+        Maybe this is program field 'netmon.Main$ { netmon.Main$ MODULE$; }'
+        Maybe this is program field 'netmon.NetInfo$ { netmon.NetInfo$ MODULE$; }'
+        Maybe this is program field 'netmon.Utils$ { netmon.Utils$ MODULE$; }'
+        Maybe this is program field 'netmon.package$ { netmon.package$ MODULE$; }'
+        Maybe this is program field 'scala.Array$ { scala.Array$ MODULE$; }'
+
+        ... ... ... ..... .... .... .... ... ....
+
+  Removing unused program classes and class elements...
+    Original number of program classes: 2515
+    Final number of program classes:    1012
+  Inlining subroutines...
+  Preverifying...
+  Writing output...
+  Preparing output jar [/home/archbox/Documents/projects/netmon.scala/bin/netmon-guard.jar]
+    Copying resources from program jar [/home/archbox/Documents/projects/netmon.scala/bin/netmon-uber.jar]
+        
+#+END_SRC
+
+
+Running: 
+
+ - Run ./bin/netmon-guard.jar or double click at this file.
+
 
 
 
