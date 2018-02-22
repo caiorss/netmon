@@ -22,9 +22,18 @@ Screenshots:
 
  - Tray icon when the computer is online 
 
+[[file:images/trayicon-online.png][file:images/trayicon-online.png]]
+
+ - Detailed error message that shows when computer is offline and user
+   clicks on the trayicon.
+
 [[file:images/network-online.png][file:images/network-online.png]]
 
  - Tray icon when the computer is offline 
+
+[[file:images/trayicon-offline.png][file:images/trayicon-offline.png]]
+
+ - Detailed error message when computer is offline.
 
 [[file:images/network-offline.png][file:images/network-offline.png]] 
 
