@@ -15,13 +15,14 @@ object Utils{
       java.lang.Thread.sleep(period)
     }
 
+    /** Get image or Icon from resource */
     def getResourceImage(file: String, cls: Class[_]): java.awt.Image = {
-    val uri = cls.getResource(file)
-    assert(uri != null, s"Error resource file $file not found")
-    java.awt.Toolkit.getDefaultToolkit().getImage(uri)
-  }
+      val uri = cls.getResource(file)
+      assert(uri != null, s"Error resource file $file not found")
+      java.awt.Toolkit.getDefaultToolkit().getImage(uri)
+    }
 
-  /// Show computation execution time
+  /**  Show computation execution time */
   def executionTime[A](comp: => A){
     val t1 = new java.util.Date()
     comp
@@ -29,6 +30,15 @@ object Utils{
     val dt = (t2.getTime - t1.getTime).toDouble / 1000.0 
     println(s"This computation took ${dt} seconds.")
   }
+
+  private val seed  = new java.util.Random()
+
+  /** Pick a random element of a list*/
+  def pickRandom[A](xs: List[A]) =
+    xs(seed.nextInt(xs.size))
+
+  def joinLines(lines: String*) =
+    lines.mkString("\n")
   
 }
 
@@ -76,13 +86,13 @@ object NetInfo{
     val fut = Future{checkHTTPSync(hostname)}
     try {
       Await.result(fut, 2.second)
-      handler(true, "Connection OK")
+      handler(true, "Connection OK.")
     } catch {
       case ex: java.net.UnknownHostException
           => try {
             // address of www.google.com = 216.58.222.100
             if(isPortOpen(address, 80))
-              handler(false, s"Error: DNS Failure\nbut connection works (can connect to $address)\ntry changing DSN")
+              handler(false, "Error: DNS Failure, but can connect to probe address")
             else 
               handler(false, "Error: DNS Failure")
           } catch {
@@ -199,10 +209,19 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
 
 /** Program Entry Point */
 object Main{
-  // Known hostname that provides HTTP service 
-  val probeHOST  = "www.google.com"
-  // Known hostname's IP address 
-  val probeADDR  = "216.58.222.100"
+
+  /**  List of pairs with hostnames and IP addresses
+    *  [(Host of Google, IP address of google), (Host of yahoo, IP of yahoo), ...]
+    *  The IP addresses can be obtained from the command $ ping www.bing.com 
+    */
+  val probeConfig = List(
+    ("www.yahoo.com",     "98.138.252.38"),
+    ("www.bing.com",      "204.79.197.200"),
+    ("www.google.com",    "172.217.30.4"),
+    ("www.amazon.com",    "54.192.56.234"),
+    ("www.twitter.com",   "104.244.42.129"),
+    ("www.microsoft.com", "23.76.243.153")    
+  )
 
   val iconOnline  =
     Utils.getResourceImage("/resources/network-online.jpg", getClass())
@@ -220,8 +239,15 @@ object Main{
     // Run action every 2000 milliseconds or 2 seconds 
     Utils.runEvery(2000){
       val time = new java.util.Date()
-      NetInfo.checkHTTP(probeHOST, probeADDR){ case (status, msg) =>
-        val statusMsg = msg + "\n Last Update : " + time.toString()
+
+      val (host, addr) = Utils.pickRandom(probeConfig)
+
+      NetInfo.checkHTTP(host, addr){ case (status, msg) =>
+        val statusMsg = Utils.joinLines(
+          msg,
+          s"Probe host and address = $host, $addr",
+          "Last Update : " + time.toString()
+        )        
         disp.display (statusMsg)
         disp.setTrayToolTip(statusMsg)
           
@@ -233,13 +259,13 @@ object Main{
             state = true
             disp.setIcon(iconOnline)
             disp.showInfo("Connection Status", "Online")
-            println("Connection Status")
+            //println("Connection Status")
           }
         } else if(state) {
           state = false
           disp.setIcon(iconOffline)
           disp.showError("Connection Status", "Offline")
-          println("Connection Status")
+          //println("Connection Status")
         }
       }
     }
