@@ -85,7 +85,7 @@ object NetInfo{
   def checkHTTP(hostname: String, address: String)(handler: (Boolean, String) => Unit) = { 
     val fut = Future{checkHTTPSync(hostname)}
     try {
-      Await.result(fut, 2.second)
+      Await.result(fut, 4.second)
       handler(true, "Connection OK.")
     } catch {
       case ex: java.net.UnknownHostException
@@ -236,8 +236,8 @@ object Main{
     // State is true for Online and false for offline 
     var state = true 
 
-    // Run action every 2000 milliseconds or 2 seconds 
-    Utils.runEvery(2000){
+    // Run action every 5000 milliseconds or 5 seconds 
+    Utils.runEvery(5000){
       val time = new java.util.Date()
 
       val (host, addr) = Utils.pickRandom(probeConfig)
