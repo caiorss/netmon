@@ -142,7 +142,55 @@ object NetInfo{
       case ex: java.net.UnknownHostException => false
     }
 
-}
+  /** Get IPv4 address of default gateway on Linux, MacOSX, BSD or Windows */
+  def findDefaultGateway(): Option[String] = {
+    import java.util.Scanner
+    def findWhen(sc: Scanner)
+                (next: => Scanner => (Boolean, String)) : Option[String] = {
+      while(sc.hasNext()){
+        val (flag, out) = next(sc)
+        if(flag) return Some(out)
+      }
+      return None
+    }
+    // Read output of process $ netstat -rn
+    //--------
+    val pb = new java.lang.ProcessBuilder("netstat", "-rn")
+    val inp = pb.start().getInputStream()
+    val out = try scala.io.Source
+      .fromInputStream(inp)
+      .mkString
+    finally {
+      inp.close()
+    }
+    // Parse process output stored in out
+    //-------
+    val sc1 = new java.util.Scanner(out)
+    val lineMatch = findWhen(sc1){ sc =>
+      val line = sc.nextLine
+      (line.contains("0.0.0.0"), line)
+    }
+    lineMatch flatMap { lin =>
+      val s = new java.util.Scanner(lin)
+      val os = System.getProperty("os.name").toLowerCase()
+      if(os.contains("linux") || os.contains("osx") || os.contains("bsd")){
+        s.next() // Ignore 1st column
+        val gIP = s.next() // Gateway's IP
+        s.next() ;
+        val flag = s.next()
+        s.next()  ; s.next() ; s.next()
+        val iface = s.next() // Related Network interface
+        if(flag == "UG") Some(gIP) else None
+      } else {
+        // Windows
+        s.next() ; s.next()
+        Some(s.next())
+      }
+    }
+  }
+
+
+} // ----- End of NetInfo moduel ---- //
 
 /** Main Graphical User Inteface */ 
 class Display(ico: java.awt.Image) extends javax.swing.JFrame{
