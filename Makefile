@@ -2,7 +2,7 @@ all: run
 uber: bin/netmon-uber.jar 
 pgd:  bin/netmon-guard.jar
 
-src := src/netmon.scala src/netmon.Display.scala src/netmon-main.scala
+src := src/netmon.scala src/main.scala src/utils.scala src/display.scala 
 
 bin/netmon.jar: $(src)
 	mkdir -p bin 

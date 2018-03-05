@@ -1,4 +1,4 @@
-package netmon
+package netmon.display
 
 /** Main Graphical User Inteface */ 
 class Display(ico: java.awt.Image) extends javax.swing.JFrame{
