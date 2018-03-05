@@ -291,10 +291,12 @@ object Main{
       val (host, addr) = Utils.pickRandom(probeConfig)
 
       NetInfo.checkHTTP(host, addr){ case (status, msg) =>
+        val gIpAddr = NetInfo.findDefaultGateway() getOrElse "Not found"
         val statusMsg = Utils.joinLines(
           msg,
           s"Probe host and address = $host, $addr",
-          "Last Update : " + time.toString()
+          s"Default gateway        = $gIpAddr",
+           "Last Update : " + time.toString()
         )        
         disp.display (statusMsg)
         disp.setTrayToolTip(statusMsg)
