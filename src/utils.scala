@@ -22,8 +22,8 @@ case class InterfaceData(
     pw.println( "Name                      = " + name)
     pw.println(s"Status                    = $status")
     pw.println( "Ethernet Address          = " + hardwareAddress)
-    pw.println( "Addresses (IPv4 and IPv6) = " + addresses.mkString(" "))
-     sw.toString
+    pw.println( "Addresses (IPv4)          = " + addresses.mkString(" "))
+    sw.toString
   }
 }
 
