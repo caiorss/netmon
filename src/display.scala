@@ -15,7 +15,7 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
     out.setEditable(false)
 
     frame.setTitle("Internet Connection Status")
-    frame.setSize(400, 120)
+    frame.setSize(600, 500)
     frame.setIconImage(ico)
     // frame.setLayout(new java.awt.FlowLayout())
     frame.add(new javax.swing.JScrollPane(out))
