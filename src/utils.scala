@@ -59,11 +59,9 @@ object Utils{
 
   def joinLines(lines: String*) =
     lines.mkString("\n")
-  
-}
 
    /** Print to a string buffer and retrieve its content as string.
-       Examples:
+       Examples: 
        {{{
           scala> withString{ s => for(i <- 1 to 4) s.print("i * 3 = " + (i * 3) + " ; ") }
           res39: String = "i * 3 = 3 ; i * 3 = 6 ; i * 3 = 9 ; i * 3 = 12 ; "
@@ -75,7 +73,7 @@ object Utils{
           3
           "
        }}}
-     */
+     */ 
    def withString(writer: java.io.PrintWriter => Unit): String = {
      val sw = new java.io.StringWriter()
      val pw = new java.io.PrintWriter(sw)
@@ -83,7 +81,7 @@ object Utils{
      sw.toString
    }
 
-} // ---- End of object Utils ----- //
+} // ---- End of object Utils ----- // 
 
 
 /** Network Information Module */
@@ -154,20 +152,16 @@ object NetInfo{
     }
   }  
 
+  def getInterfaceAddress(net: NetworkInterface) = {
+    net.getInterfaceAddresses()
+      .asScala
+      .toSeq
+      .find(inf => inf.getBroadcast() != null)
+      .map(_.getAddress())
+  }
+
 
   def getInterfaces(): Map[String,java.net.InetAddress] = {
-    import java.net.InetAddress
-    import java.net.NetworkInterface
-    import collection.JavaConverters._
-
-    def getInterfaceAddress(net: NetworkInterface) = {
-      net.getInterfaceAddresses()
-        .asScala
-        .toSeq
-        .find(inf => inf.getBroadcast() != null)
-        .map(_.getAddress())
-    }
-
     val interfaces = NetworkInterface
       .getNetworkInterfaces()
       .asScala
@@ -181,6 +175,39 @@ object NetInfo{
       .map(ni => (ni.getName(), getInterfaceAddress(ni).get))
       .toMap
   } // ----- EOF function getInterfaces() -------- //
+
+
+  /** Get all addresses (IPs numbers) of a network interface */
+  def getInterfaceAddresses(iface: NetworkInterface): List[String] =
+    iface.getInetAddresses()
+      .asScala.toSeq
+      .map(_.getCanonicalHostName)
+      .filter(_.contains(":"))
+      .toList
+
+   /** Get a list with all network interfaces */
+   def getIfacesData(): List[InterfaceData] = {
+     def ethernetAddrToString(bytes: Array[Byte]) =
+       bytes match {
+         case null  => ""
+         case _     => bytes.map(b => "%02X".format(b)).mkString(":")
+       }
+     val interfaces = NetworkInterface
+       .getNetworkInterfaces()
+       .asScala
+       .toSeq
+     interfaces.map{ iface =>
+       InterfaceData(
+         name            = iface.getName(),
+         displayName     = iface.getDisplayName(),
+         isUp            = iface.isUp,
+         isVirtual       = iface.isVirtual, 
+         multicast       = iface.supportsMulticast,
+         hardwareAddress = ethernetAddrToString(iface.getHardwareAddress()),
+         addresses       = getInterfaceAddresses(iface)
+       )
+     }.toList
+   }
 
   def checkDNS() =
     try {
