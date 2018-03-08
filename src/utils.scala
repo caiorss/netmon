@@ -6,6 +6,26 @@ import scala.util.{Success, Failure}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
+case class InterfaceData(
+  name:              String,
+  displayName:       String,
+  isUp:              Boolean,
+  isVirtual:         Boolean,
+  multicast:         Boolean,
+  hardwareAddress:   String,
+  addresses:         List[String]
+) {
+  override def toString() = {
+    val sw = new java.io.StringWriter()
+    val pw = new java.io.PrintWriter(sw)
+    val status = if (isUp) "up" else "down"
+    pw.println( "Name                      = " + name)
+    pw.println(s"Status                    = $status")
+    pw.println( "Ethernet Address          = " + hardwareAddress)
+    pw.println( "Addresses (IPv4 and IPv6) = " + addresses.mkString(" "))
+     sw.toString
+  }
+}
 
 /** General utility functions */ 
 object Utils{
