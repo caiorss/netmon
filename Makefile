@@ -1,4 +1,5 @@
-all: run
+all:  base 
+base: bin/netmon.jar 
 uber: bin/netmon-uber.jar 
 pgd:  bin/netmon-guard.jar
 

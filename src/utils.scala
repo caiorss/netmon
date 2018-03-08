@@ -6,6 +6,27 @@ import scala.util.{Success, Failure}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
+case class InterfaceData(
+  name:              String,
+  displayName:       String,
+  isUp:              Boolean,
+  isVirtual:         Boolean,
+  multicast:         Boolean,
+  hardwareAddress:   String,
+  addresses:         List[String]
+) {
+  override def toString() = {
+    val sw = new java.io.StringWriter()
+    val pw = new java.io.PrintWriter(sw)
+    val status = if (isUp) "up" else "down"
+    pw.println( "Name                      = " + name)
+    pw.println( "Display Name              = " + displayName)
+    pw.println(s"Status                    = $status")
+    pw.println( "Ethernet Address          = " + hardwareAddress)
+    pw.println( "Addresses (IPv4)          = " + addresses.mkString(" "))
+    sw.toString
+  }
+}
 
 /** General utility functions */ 
 object Utils{
@@ -39,11 +60,37 @@ object Utils{
 
   def joinLines(lines: String*) =
     lines.mkString("\n")
-  
-}
+
+   /** Print to a string buffer and retrieve its content as string.
+       Examples: 
+       {{{
+          scala> withString{ s => for(i <- 1 to 4) s.print("i * 3 = " + (i * 3) + " ; ") }
+          res39: String = "i * 3 = 3 ; i * 3 = 6 ; i * 3 = 9 ; i * 3 = 12 ; "
+
+          scala> withString{ s => for(i <- 1 to 3) s.println(i) }
+          res41: String =
+          "1
+          2
+          3
+          "
+       }}}
+     */ 
+   def withString(writer: java.io.PrintWriter => Unit): String = {
+     val sw = new java.io.StringWriter()
+     val pw = new java.io.PrintWriter(sw)
+     writer(pw)
+     sw.toString
+   }
+
+} // ---- End of object Utils ----- // 
+
 
 /** Network Information Module */
 object NetInfo{
+
+  import java.net.InetAddress
+  import java.net.NetworkInterface
+  import collection.JavaConverters._
 
   /** Returns true if TCP port from a given address is open */
   def isPortOpen(address: String, port: Int, timeout: Int = 1000): Boolean = {
@@ -106,20 +153,16 @@ object NetInfo{
     }
   }  
 
+  def getInterfaceAddress(net: NetworkInterface) = {
+    net.getInterfaceAddresses()
+      .asScala
+      .toSeq
+      .find(inf => inf.getBroadcast() != null)
+      .map(_.getAddress())
+  }
+
 
   def getInterfaces(): Map[String,java.net.InetAddress] = {
-    import java.net.InetAddress
-    import java.net.NetworkInterface
-    import collection.JavaConverters._
-
-    def getInterfaceAddress(net: NetworkInterface) = {
-      net.getInterfaceAddresses()
-        .asScala
-        .toSeq
-        .find(inf => inf.getBroadcast() != null)
-        .map(_.getAddress())
-    }
-
     val interfaces = NetworkInterface
       .getNetworkInterfaces()
       .asScala
@@ -133,6 +176,39 @@ object NetInfo{
       .map(ni => (ni.getName(), getInterfaceAddress(ni).get))
       .toMap
   } // ----- EOF function getInterfaces() -------- //
+
+  /** Get all addresses (IPs numbers) of a network interface */
+  def getInterfaceAddresses(iface: NetworkInterface): List[String] =
+    iface.getInetAddresses()
+      .asScala.toSeq
+      .map(_.getAddress())
+      .filter(_.size == 4)  // Select IPv4 only - 4 bytes
+      .map{addr => addr.map(b => b & 0xFF).mkString(".") }
+      .toList
+
+   /** Get a list with all network interfaces */
+   def getIfacesData(): List[InterfaceData] = {
+     def ethernetAddrToString(bytes: Array[Byte]) =
+       bytes match {
+         case null  => ""
+         case _     => bytes.map(b => "%02X".format(b)).mkString(":")
+       }
+     val interfaces = NetworkInterface
+       .getNetworkInterfaces()
+       .asScala
+       .toSeq
+     interfaces.map{ iface =>
+       InterfaceData(
+         name            = iface.getName(),
+         displayName     = iface.getDisplayName(),
+         isUp            = iface.isUp,
+         isVirtual       = iface.isVirtual, 
+         multicast       = iface.supportsMulticast,
+         hardwareAddress = ethernetAddrToString(iface.getHardwareAddress()),
+         addresses       = getInterfaceAddresses(iface)
+       )
+     }.toList
+   }
 
   def checkDNS() =
     try {

@@ -16,24 +16,25 @@ the DNS is failing.
 
 Features: 
  
- - Small and cross platform network connection status. 
+ + Small and cross platform network connection status app.
+ + Show network interfaces data. 
 
 Screenshots: 
 
- - Tray icon when the computer is online 
+ - Tray icon when the computer is online (on Linux with Xfce)
 
 [[file:images/trayicon-online.png][file:images/trayicon-online.png]]
 
  - Detailed error message that shows when computer is offline and user
-   clicks on the trayicon.
+   clicks on the trayicon. (on Windows 10)
 
 [[file:images/network-online.png][file:images/network-online.png]]
 
- - Tray icon when the computer is offline 
+ - Tray icon when the computer is offline (on Linux)
 
 [[file:images/trayicon-offline.png][file:images/trayicon-offline.png]]
 
- - Detailed error message when computer is offline.
+ - Detailed error message when computer is offline. (on Windows 10)
 
 [[file:images/network-offline.png][file:images/network-offline.png]] 
 
