@@ -182,7 +182,7 @@ object NetInfo{
     iface.getInetAddresses()
       .asScala.toSeq
       .map(_.getCanonicalHostName)
-      .filter(_.contains(":"))
+      .filter(!_.contains(":"))
       .toList
 
    /** Get a list with all network interfaces */
