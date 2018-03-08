@@ -177,13 +177,13 @@ object NetInfo{
       .toMap
   } // ----- EOF function getInterfaces() -------- //
 
-
   /** Get all addresses (IPs numbers) of a network interface */
   def getInterfaceAddresses(iface: NetworkInterface): List[String] =
     iface.getInetAddresses()
       .asScala.toSeq
-      .map(_.getCanonicalHostName)
-      .filter(!_.contains(":"))
+      .map(_.getAddress())
+      .filter(_.size == 4)  // Select IPv4 only - 4 bytes
+      .map{addr => addr.map(b => b & 0xFF).mkString(".") }
       .toList
 
    /** Get a list with all network interfaces */
