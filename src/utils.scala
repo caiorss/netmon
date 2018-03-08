@@ -20,6 +20,7 @@ case class InterfaceData(
     val pw = new java.io.PrintWriter(sw)
     val status = if (isUp) "up" else "down"
     pw.println( "Name                      = " + name)
+    pw.println( "Display Name              = " + displayName)
     pw.println(s"Status                    = $status")
     pw.println( "Ethernet Address          = " + hardwareAddress)
     pw.println( "Addresses (IPv4)          = " + addresses.mkString(" "))
