@@ -48,16 +48,24 @@ object Main{
     Utils.runEvery(5000){
       val time = new java.util.Date()
 
+      // Choose a random probing pair of hostname and address 
       val (host, addr) = Utils.pickRandom(probeConfig)
 
       NetInfo.checkHTTP(host, addr){ case (status, msg) =>
         val gIpAddr = NetInfo.findDefaultGateway() getOrElse "Not found"
-        val statusMsg = Utils.joinLines(
-          msg,
-          s"Probe host and address = $host, $addr",
-          s"Default gateway        = $gIpAddr",
-           "Last Update : " + time.toString()
-        )        
+
+        val statusMsg = Utils.withString{ pw =>
+          pw.println(msg)
+          pw.println(s"Probe host and address = $host, $addr")
+          pw.println(s"Default gateway        = $gIpAddr")
+          pw.println( "Last Update            = " + time.toString())
+          pw.println()
+          pw.println("Network Interfaces Data")
+          pw.println("---------------------------------------")
+          pw.println()
+          NetInfo.getIfacesData() foreach pw.println
+        }
+
         disp.display (statusMsg)
         disp.setTrayToolTip(statusMsg)
           
