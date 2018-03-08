@@ -89,6 +89,10 @@ object Utils{
 /** Network Information Module */
 object NetInfo{
 
+  import java.net.InetAddress
+  import java.net.NetworkInterface
+  import collection.JavaConverters._
+
   /** Returns true if TCP port from a given address is open */
   def isPortOpen(address: String, port: Int, timeout: Int = 1000): Boolean = {
     import java.net.Socket
