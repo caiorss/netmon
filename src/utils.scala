@@ -42,6 +42,30 @@ object Utils{
   
 }
 
+   /** Print to a string buffer and retrieve its content as string.
+       Examples:
+       {{{
+          scala> withString{ s => for(i <- 1 to 4) s.print("i * 3 = " + (i * 3) + " ; ") }
+          res39: String = "i * 3 = 3 ; i * 3 = 6 ; i * 3 = 9 ; i * 3 = 12 ; "
+
+          scala> withString{ s => for(i <- 1 to 3) s.println(i) }
+          res41: String =
+          "1
+          2
+          3
+          "
+       }}}
+     */
+   def withString(writer: java.io.PrintWriter => Unit): String = {
+     val sw = new java.io.StringWriter()
+     val pw = new java.io.PrintWriter(sw)
+     writer(pw)
+     sw.toString
+   }
+
+} // ---- End of object Utils ----- //
+
+
 /** Network Information Module */
 object NetInfo{
 
