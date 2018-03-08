@@ -20,12 +20,15 @@ object Main{
     *  The IP addresses can be obtained from the command $ ping www.bing.com 
     */
   val probeConfig = List(
+    ("www.youtube.com",   "216.58.222.78"),
     ("www.yahoo.com",     "98.138.252.38"),
     ("www.bing.com",      "204.79.197.200"),
     ("www.google.com",    "172.217.30.4"),
     ("www.amazon.com",    "54.192.56.234"),
     ("www.twitter.com",   "104.244.42.129"),
-    ("www.microsoft.com", "23.76.243.153")    
+    ("www.microsoft.com", "23.76.243.153"),
+    ("www.baidu.com",     "103.235.46.39"),
+    ("www.yandex.com",    "213.180.204.62")
   )
 
   val iconOnline  =
