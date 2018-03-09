@@ -10,7 +10,7 @@ import scala.concurrent.duration._
 import netmon.utils.{Utils, NetInfo}
 
 // file: display.scala 
-import netmon.display.Display
+import netmon.display.{Display, GUIUtils}
 
 /** Program Entry Point */
 object Main{
@@ -38,9 +38,29 @@ object Main{
     Utils.getResourceImage("/resources/network-offline.png", getClass())
 
   def main(args: Array[String]) = {
-    val disp = new Display(iconOnline)
+    val disp             = new Display(iconOnline)
+    val exitCmd          = GUIUtils.makeCommand{ System.exit(1) }
+    val notImplmentedCmd = GUIUtils.makeCommand{
+      GUIUtils.showWarning("Error: Command not implemented", frame = disp)
+    }
+    val openSiteCmd = GUIUtils.makeCommand{
+      NetInfo.findDefaultGateway() match {
+        case Some(addr)
+            => Utils.openUrl("http://" + addr)
+        case None
+            => GUIUtils.showWarning(
+              "Error: gateway's address not found.",
+              "Error Report",
+              frame = disp
+            )
+      }
+    }    
+    disp.setExitCommand(exitCmd)
+    disp.setRefreshCommand(notImplmentedCmd)          
+    disp.setOpenSiteCommand(openSiteCmd)
+      
+ 
     // disp.setIconImage(iconOnline)
-
     // State is true for Online and false for offline 
     var state = true 
 
