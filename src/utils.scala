@@ -266,4 +266,4 @@ object NetInfo{
   }
 
 
-} // ----- End of NetInfo moduel ---- //
+} // ----- End of NetInfo object ---- //

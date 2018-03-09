@@ -12,10 +12,12 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
   private def init(){
     val frame = this
 
+    // Make JTextArea read-only 
     out.setEditable(false)
+    out.setFont(new java.awt.Font("monospaced", java.awt.Font.PLAIN, 12))
 
     frame.setTitle("Internet Connection Status")
-    frame.setSize(600, 500)
+    frame.setSize(450, 500)
     frame.setIconImage(ico)
     // frame.setLayout(new java.awt.FlowLayout())
     frame.add(new javax.swing.JScrollPane(out))
