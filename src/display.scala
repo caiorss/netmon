@@ -1,5 +1,9 @@
 package netmon.display
 
+import javax.swing.{JPanel, JFrame, JButton}
+import java.awt.{BorderLayout, FlowLayout}
+
+
 /** Main Graphical User Inteface */ 
 class Display(ico: java.awt.Image) extends javax.swing.JFrame{
   private val out      = new javax.swing.JTextArea()
