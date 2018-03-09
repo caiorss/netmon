@@ -5,7 +5,7 @@ import java.awt.{BorderLayout, FlowLayout}
 
 
 object GUIUtils{
-
+  
   def onClick(button: JButton) (handler: => Unit) = {
     button.addActionListener(
       new java.awt.event.ActionListener(){
@@ -28,11 +28,15 @@ object GUIUtils{
 
 /** Main Graphical User Inteface */ 
 class Display(ico: java.awt.Image) extends javax.swing.JFrame{
-  private val out      = new javax.swing.JTextArea()
-  private val tray     = java.awt.SystemTray.getSystemTray()
-  private val toolkit  = java.awt.Toolkit.getDefaultToolkit()
-  private val popuMenu = new java.awt.PopupMenu()
-  private val icon     = new java.awt.TrayIcon(ico)
+  private val out               = new javax.swing.JTextArea()
+  private val tray              = java.awt.SystemTray.getSystemTray()
+  private val toolkit           = java.awt.Toolkit.getDefaultToolkit()
+  private val popuMenu          = new java.awt.PopupMenu()
+  private val icon              = new java.awt.TrayIcon(ico)
+  private val btnRefesh         = new JButton("Refresh")
+  private val btnOpenRouterSite = new javax.swing.JButton("Open Router Site")
+  private val btnExit           = new JButton("Exit")
+  private val bgColor           = java.awt.Color.WHITE
 
   init()
   private def init(){
@@ -42,15 +46,28 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
     out.setEditable(false)
     out.setFont(new java.awt.Font("monospaced", java.awt.Font.PLAIN, 12))
 
+    frame.setLayout(new java.awt.BorderLayout())
     frame.setTitle("Internet Connection Status")
     frame.setSize(580, 500)
     frame.setIconImage(ico)
-    // frame.setLayout(new java.awt.FlowLayout())
-    frame.add(new javax.swing.JScrollPane(out))
-    frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE)
-    frame.setBackground(java.awt.Color.CYAN)
-
+    // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+    frame.getContentPane().setBackground(java.awt.Color.CYAN)
     frame.setResizable(false)
+
+    btnRefesh.setBackground(bgColor)
+    btnOpenRouterSite.setBackground(bgColor)
+    btnExit.setBackground(bgColor)
+
+    val buttonPane = new JPanel()
+    buttonPane.setLayout(new java.awt.FlowLayout())
+    buttonPane.setBackground(bgColor)
+    buttonPane.add(btnRefesh)
+    buttonPane.add(btnOpenRouterSite)
+    buttonPane.add(btnExit)
+
+    // frame.setLayout(new java.awt.FlowLayout())
+    frame.add(buttonPane, BorderLayout.NORTH)
+    frame.add(new javax.swing.JScrollPane(out), BorderLayout.CENTER)
 
     icon.setToolTip("Network Status Monitoring")
     tray.add(icon)
@@ -67,8 +84,19 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
     }
     icon.addActionListener(listener)
 
+    val showNotImplementedWarning =
+      () => GUIUtils.showWarning("Error: Not implemented.", "Error report",  this)
+
+    GUIUtils.onClick(btnRefesh){
+      showNotImplementedWarning()
+    }
+    GUIUtils.onClick(btnOpenRouterSite){
+      showNotImplementedWarning()
+    }
+    GUIUtils.onClick(btnExit){System.exit(0)}
+
     //frame.setVisible(true)
-  }
+  } // --- EOF method init() ---- // 
 
   def display(msg: String) =
     out.setText(msg)
