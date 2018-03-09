@@ -21,7 +21,7 @@ object GUIUtils{
       .showMessageDialog(
         frame,
         message,
-        "Alert",
+        title,
         javax.swing.JOptionPane.WARNING_MESSAGE
     )
 }
@@ -34,7 +34,7 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
   private val popuMenu          = new java.awt.PopupMenu()
   private val icon              = new java.awt.TrayIcon(ico)
   private val btnRefesh         = new JButton("Refresh")
-  private val btnOpenRouterSite = new javax.swing.JButton("Open Router Site")
+  private val btnOpenRouterSite = new javax.swing.JButton("Open Router's Site")
   private val btnExit           = new JButton("Exit")
   private val bgColor           = java.awt.Color.WHITE
 
