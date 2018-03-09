@@ -30,14 +30,15 @@ case class InterfaceData(
 
 /** General utility functions */ 
 object Utils{
+
   def runEvery(period: Int)(action: => Unit) =
     while(true){
       action
       java.lang.Thread.sleep(period)
     }
 
-    /** Get image or Icon from resource */
-    def getResourceImage(file: String, cls: Class[_]): java.awt.Image = {
+  /** Get image or Icon from resource */
+  def getResourceImage(file: String, cls: Class[_]): java.awt.Image = {
       val uri = cls.getResource(file)
       assert(uri != null, s"Error resource file $file not found")
       java.awt.Toolkit.getDefaultToolkit().getImage(uri)
@@ -61,7 +62,17 @@ object Utils{
   def joinLines(lines: String*) =
     lines.mkString("\n")
 
-   /** Print to a string buffer and retrieve its content as string.
+  def openUrl(uri: String){
+    import java.awt.Desktop
+    import java.io.IOException
+    import java.net.URI
+    import java.net.URISyntaxException
+    val u = new URI(uri)
+    val desktop = Desktop.getDesktop()
+    desktop.browse(u)
+  }
+
+  /** Print to a string buffer and retrieve its content as string.
        Examples: 
        {{{
           scala> withString{ s => for(i <- 1 to 4) s.print("i * 3 = " + (i * 3) + " ; ") }
@@ -75,14 +86,14 @@ object Utils{
           "
        }}}
      */ 
-   def withString(writer: java.io.PrintWriter => Unit): String = {
-     val sw = new java.io.StringWriter()
-     val pw = new java.io.PrintWriter(sw)
-     writer(pw)
-     sw.toString
-   }
+  def withString(writer: java.io.PrintWriter => Unit): String = {
+    val sw = new java.io.StringWriter()
+    val pw = new java.io.PrintWriter(sw)
+    writer(pw)
+    sw.toString
+  }
 
-} // ---- End of object Utils ----- // 
+} // ---- End of object Utils ----- //
 
 
 /** Network Information Module */
