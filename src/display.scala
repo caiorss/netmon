@@ -6,6 +6,11 @@ import java.awt.{BorderLayout, FlowLayout}
 
 object GUIUtils{
   
+
+  object Types{
+    type Command = java.awt.event.ActionListener
+  }
+
   def onClick(button: JButton) (handler: => Unit) = {
     button.addActionListener(
       new java.awt.event.ActionListener(){
