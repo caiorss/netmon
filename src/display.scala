@@ -5,11 +5,17 @@ import java.awt.{BorderLayout, FlowLayout}
 
 
 object GUIUtils{
-  
 
   object Types{
     type Command = java.awt.event.ActionListener
   }
+
+  def makeCommand(handler: => Unit) =     
+      new java.awt.event.ActionListener(){
+        def actionPerformed(evt: java.awt.event.ActionEvent) = {
+          handler
+        }
+      }    
 
   def onClick(button: JButton) (handler: => Unit) = {
     button.addActionListener(
@@ -42,6 +48,8 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
   private val btnOpenRouterSite = new javax.swing.JButton("Open Router's Site")
   private val btnExit           = new JButton("Exit")
   private val bgColor           = java.awt.Color.WHITE
+
+  import GUIUtils.Types.Command
 
   init()
   private def init(){
@@ -89,19 +97,17 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
     }
     icon.addActionListener(listener)
 
-    val showNotImplementedWarning =
-      () => GUIUtils.showWarning("Error: Not implemented.", "Error report",  this)
-
-    GUIUtils.onClick(btnRefesh){
-      showNotImplementedWarning()
-    }
-    GUIUtils.onClick(btnOpenRouterSite){
-      showNotImplementedWarning()
-    }
-    GUIUtils.onClick(btnExit){System.exit(0)}
-
     //frame.setVisible(true)
-  } // --- EOF method init() ---- // 
+  } // --- EOF method init() ---- //
+
+  def setExitCommand(cmd: Command) =
+    btnExit.addActionListener(cmd)
+
+  def setOpenSiteCommand(cmd: Command) =
+    btnOpenRouterSite.addActionListener(cmd)
+
+  def setRefreshCommand(cmd: Command) =
+    btnRefesh.addActionListener(cmd)
 
   def display(msg: String) =
     out.setText(msg)
