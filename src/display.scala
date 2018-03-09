@@ -4,6 +4,28 @@ import javax.swing.{JPanel, JFrame, JButton}
 import java.awt.{BorderLayout, FlowLayout}
 
 
+object GUIUtils{
+
+  def onClick(button: JButton) (handler: => Unit) = {
+    button.addActionListener(
+      new java.awt.event.ActionListener(){
+        def actionPerformed(evt: java.awt.event.ActionEvent) = {
+          handler
+        }
+      }
+    )
+  }
+
+  def showWarning(message: String, title: String = "Alert", frame: JFrame = null) =
+    javax.swing.JOptionPane
+      .showMessageDialog(
+        frame,
+        message,
+        "Alert",
+        javax.swing.JOptionPane.WARNING_MESSAGE
+    )
+}
+
 /** Main Graphical User Inteface */ 
 class Display(ico: java.awt.Image) extends javax.swing.JFrame{
   private val out      = new javax.swing.JTextArea()
