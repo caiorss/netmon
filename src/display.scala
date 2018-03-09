@@ -17,12 +17,13 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
     out.setFont(new java.awt.Font("monospaced", java.awt.Font.PLAIN, 12))
 
     frame.setTitle("Internet Connection Status")
-    frame.setSize(450, 500)
+    frame.setSize(580, 500)
     frame.setIconImage(ico)
     // frame.setLayout(new java.awt.FlowLayout())
     frame.add(new javax.swing.JScrollPane(out))
     frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE)
     frame.setBackground(java.awt.Color.CYAN)
+
     frame.setResizable(false)
 
     icon.setToolTip("Network Status Monitoring")
