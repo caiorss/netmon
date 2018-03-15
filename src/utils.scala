@@ -131,16 +131,24 @@ object NetInfo{
     }
   }
 
+
+
+  /** Check if port 80 or 443 of a given hostname or address is open by reading
+      first 50 bytes and then closing the connection.
+      Note: This function is synchronous and doesn't have a timeout. So it can block
+       GUI threads.
+    */
   def checkHTTPSync(hostname: String) =  {
+    val bufferSize = 50 // number of bytes to read
     var is: java.io.InputStream = null  
     val c = new java.net.URL("http://" + hostname).openConnection()
     try {
       is = c.getInputStream()
-      val buffer = new Array[Char](50)
+      val buffer = new Array[Char](bufferSize)
       val br = new java.io.BufferedReader(
         new java.io.InputStreamReader(is)
       )   
-      br.read(buffer, 0, 50)
+      br.read(buffer, 0, bufferSize)
       val line = buffer.mkString
       //println("line = " + line)
       line 
