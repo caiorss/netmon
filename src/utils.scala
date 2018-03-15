@@ -116,18 +116,19 @@ object NetInfo{
   def isPortOpen(address: String, port: Int, timeout: Int = 1000): Boolean = {
     import java.net.Socket
     import java.net.InetSocketAddress
-    try {
+    try Utils.runWithTimeout(timeout){
       val sock = new Socket()
-      sock.connect(new InetSocketAddress(address, port), timeout)
+      sock.connect(new InetSocketAddress(address, port))
       sock.close()
       true
     } catch {
       // Connection refused exception
-      case (ex: java.net.ConnectException)
+      case ex: java.net.ConnectException
           => false
-      case (ex: java.net.SocketTimeoutException)
+      case ex: java.net.SocketTimeoutException
           => false
-      case ex: Throwable => throw ex
+      case ex: java.util.concurrent.TimeoutException
+          => false
     }
   }
 
