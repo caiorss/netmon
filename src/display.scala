@@ -1,6 +1,6 @@
 package netmon.display
 
-import javax.swing.{JPanel, JFrame, JButton}
+import javax.swing.{JPanel, JFrame, JButton, JLabel, JTabbedPane, JComponent}
 import java.awt.{BorderLayout, FlowLayout}
 
 
@@ -35,6 +35,18 @@ object GUIUtils{
         title,
         javax.swing.JOptionPane.WARNING_MESSAGE
     )
+
+  def makeTextPanel(text: String) = {
+    import java.awt._
+    import javax.swing.{JLabel, JPanel}
+    val panel = new JPanel(false)
+    val filler = new JLabel()
+    // filler.setHorizontalAlignment(JLabel.CENTER)
+    panel.setLayout(new GridLayout(1, 1))
+    panel.add(filler)
+    panel
+  }
+
 }
 
 /** Main Graphical User Inteface */ 
@@ -55,22 +67,19 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
   private def init(){
     val frame = this
 
-    // Make JTextArea read-only 
+    // ---- Tray Icon Setup ------------- // 
+    icon.setToolTip("Network Status Monitoring")
+    tray.add(icon)
+    icon.setImageAutoSize(true)  
+
+    // Make JTextArea read-only
     out.setEditable(false)
     out.setFont(new java.awt.Font("monospaced", java.awt.Font.PLAIN, 12))
 
-    frame.setLayout(new java.awt.BorderLayout())
-    frame.setTitle("Internet Connection Status")
-    frame.setSize(580, 500)
-    frame.setIconImage(ico)
-    // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-    frame.getContentPane().setBackground(java.awt.Color.CYAN)
-    frame.setResizable(false)
 
-    btnRefesh.setBackground(bgColor)
-    btnOpenRouterSite.setBackground(bgColor)
-    btnExit.setBackground(bgColor)
-
+    // ---- Connection Status Panel ------- //
+    val panelStatus = GUIUtils.makeTextPanel("Network Information")
+    panelStatus.setLayout(new java.awt.BorderLayout())
     val buttonPane = new JPanel()
     buttonPane.setLayout(new java.awt.FlowLayout())
     buttonPane.setBackground(bgColor)
@@ -78,14 +87,29 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
     buttonPane.add(btnOpenRouterSite)
     buttonPane.add(btnExit)
 
-    // frame.setLayout(new java.awt.FlowLayout())
-    frame.add(buttonPane, BorderLayout.NORTH)
-    frame.add(new javax.swing.JScrollPane(out), BorderLayout.CENTER)
+    panelStatus.add(buttonPane, BorderLayout.NORTH)
+    panelStatus.add(new javax.swing.JScrollPane(out), BorderLayout.CENTER)
+    panelStatus.add(popuMenu)
 
-    icon.setToolTip("Network Status Monitoring")
-    tray.add(icon)
-    icon.setImageAutoSize(true)
-    frame.add(popuMenu)
+    btnRefesh.setBackground(bgColor)
+    btnOpenRouterSite.setBackground(bgColor)
+    btnExit.setBackground(bgColor)
+
+    //----- Tabbed Pane (main pane) --------------// 
+
+    val tabbedPane = new JTabbedPane()
+    tabbedPane.add("Connection Status", panelStatus)
+
+    // ----- Frame Setup ---------------- // 
+
+    frame.setContentPane(tabbedPane)    
+    frame.setTitle("Internet Connection Status")
+    frame.setSize(580, 500)
+    frame.setIconImage(ico)
+    // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+    frame.getContentPane().setBackground(java.awt.Color.CYAN)
+    frame.setResizable(false)
+
 
     var flag = false
 
