@@ -72,16 +72,27 @@ object Main{
       val (host, addr) = Utils.pickRandom(probeConfig)
 
       NetInfo.checkHTTP(host, addr){ case (status, msg) =>
-        val gIpAddr = NetInfo.findDefaultGateway() getOrElse "Not found"
+
+        val gatewayAddress = NetInfo.findDefaultGateway() 
+        val gIpAddr = gatewayAddress getOrElse "Not found"
+
+        val canAccessGateway: Boolean =
+          gatewayAddress.map {addr =>
+            val flag1 = NetInfo.isPortOpen(addr, 80,  500)
+            val flag2 = NetInfo.isPortOpen(addr, 443, 500)
+            flag1 || flag2 
+          }.getOrElse(false)
 
         val statusMsg = Utils.withString{ pw =>
           pw.println(msg)
-          pw.println(s"Probe host and address = $host, $addr")
-          pw.println(s"Default gateway        = $gIpAddr")
-          pw.println( "Last Update            = " + time.toString())
+          pw.println()
+          pw.println(s"Probe host and address       $host, $addr")
+          pw.println(s"Default gateway              $gIpAddr")
+          pw.println(s"Can access router's web page $canAccessGateway")
+          pw.println( "Last Update                  " + time.toString())
           pw.println()
           pw.println("Network Interfaces Data")
-          pw.println("---------------------------------------")
+          pw.println("--------------------------------------------------")
           pw.println()
           NetInfo.getIfacesData() foreach pw.println
         }
