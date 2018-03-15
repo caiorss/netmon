@@ -93,6 +93,15 @@ object Utils{
     sw.toString
   }
 
+  /** Attempt to get a return value with timeout and throws TimeoutException
+      if the timeout is violated.
+      Throws: java.util.concurrent.TimeoutException
+    */
+  def runWithTimeout[A](timeoutMs: Int)(action: => A): A = {
+    val fut = Future { action }
+    Await.result(fut, timeoutMs.milliseconds)
+  }
+
 } // ---- End of object Utils ----- //
 
 
