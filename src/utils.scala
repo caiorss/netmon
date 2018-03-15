@@ -127,6 +127,8 @@ object NetInfo{
           => false
       case ex: java.net.SocketTimeoutException
           => false
+      case ex: java.net.NoRouteToHostException
+          => false 
       case ex: java.util.concurrent.TimeoutException
           => false
     }
