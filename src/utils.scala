@@ -102,6 +102,79 @@ object Utils{
     Await.result(fut, timeoutMs.milliseconds)
   }
 
+  /** Stream process or shell command to output in async mode (without
+     block current thread.)
+    */
+  def streamProcessOutput(
+    cmd:       String,
+    args:      List[String] = List(),
+    timeoutMs: Int = 5000
+    )(out: java.io.PrintWriter) = Future {
+    val pb = new java.lang.ProcessBuilder(cmd)
+    args foreach pb.command.add
+    val proc = pb.start()
+    //process = proc
+    val stdout = new java.util.Scanner(proc.getInputStream())
+    val stderr = new java.util.Scanner(proc.getErrorStream())
+    // Read process output in a new thread
+    val fut = Future {
+      while(stdout.hasNextLine())
+        out.println(stdout.nextLine())
+      while(stderr.hasNextLine())
+        out.println(stderr.nextLine())
+      out.println("Process ended with exit status = " + proc.exitValue())
+    }
+    // Monitor process thread waiting it finish until timeout is reached.
+    // If timeout is reached, kill the process.
+    try Await.result(fut, timeoutMs.milliseconds)
+    catch {
+      case ex: java.util.concurrent.TimeoutException
+          => {
+            proc.destroy()
+            out.println("\nProcess killed after timeout exceeded")
+          }
+    } finally {
+      stdout.close()
+      stderr.close()
+    }
+  }
+
+  val stdout = new java.io.PrintWriter(System.out, true)
+
+  /** Helper class to turn a TextArea widget into a PrintWriter and
+      allow redirecting stdout IO to it.
+    */
+  class TextAreaWriter(ta: javax.swing.JTextArea, maxLines: Int = 20) extends java.io.Writer{
+    private val buffer = new StringBuilder()
+
+    def countLines() =
+      ta.getText().lines.count(_ => true)
+
+    override def write(arr: Array[Char]) =
+      buffer.append(arr.mkString)
+
+    override def write(arr: Array[Char], off: Int, len: Int) =
+      buffer.append(arr.slice(off, off + len).mkString)
+
+    override def write(str: String) =
+      buffer.append(str)
+
+    override def flush() = {
+      if(this.countLines() > maxLines)
+        buffer.clear()
+      ta.append(buffer.toString)
+      // Scroll to bottom
+      ta.setCaretPosition(ta.getDocument().getLength())
+    }
+
+    // Don't do anything - dummy method
+    override def close() = ()
+  }
+
+  /** Create PrintWriter object out of a JTextArea object. */
+  def makeTextAreaPW(ta: javax.swing.JTextArea): java.io.PrintWriter =
+    new java.io.PrintWriter(new TextAreaWriter(ta), true)
+
 } // ---- End of object Utils ----- //
 
 
@@ -127,6 +200,8 @@ object NetInfo{
           => false
       case ex: java.net.SocketTimeoutException
           => false
+      case ex: java.net.NoRouteToHostException
+          => false 
       case ex: java.util.concurrent.TimeoutException
           => false
     }

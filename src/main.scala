@@ -37,9 +37,23 @@ object Main{
   val iconOffline =
     Utils.getResourceImage("/resources/network-offline.png", getClass())
 
+  def monitorFuture[A](task: Future[A], command: String)(printer: String => Unit) = {
+    Future {
+      while(!task.isCompleted){
+        Thread.sleep(500)
+        printer(s"Status: Running $command ...")
+        Thread.sleep(500)
+        printer(s"Status: Running $command ... ...")
+      }
+      printer("Status: Process finished.")
+    }
+  }
+
+  val defaultTimeout = 30000
+
   def main(args: Array[String]) = {
     val disp             = new Display(iconOnline)
-    val exitCmd          = GUIUtils.makeCommand{ System.exit(1) }
+    val exitCmd          = GUIUtils.makeCommand{ System.exit(0) }    
     val notImplmentedCmd = GUIUtils.makeCommand{
       GUIUtils.showWarning("Error: Command not implemented", frame = disp)
     }
@@ -54,11 +68,44 @@ object Main{
               frame = disp
             )
       }
-    }    
+    }
+
+    val guiDisplayPW = disp.getCommandDisplayWriter()
+    //val guiDisplayPW = Utils.stdout
+
+    val pingCommand = GUIUtils.makeCommand{
+      // Address of Google's DNS = 8.8.8.8
+      disp.clearCommandDisplayWriter()
+      val task = Utils.streamProcessOutput(
+        "ping", List("8.8.8.8"), timeoutMs = 5000){guiDisplayPW}
+      monitorFuture(task, "ping 8.8.8.8"){disp.setProcessStatusText}
+    }
+
+    val tracerouteCommand = GUIUtils.makeCommand{      
+      val cmd = if(System.getProperty("os.name").contains("windows"))
+        "tracert"
+      else
+        "traceroute"
+      disp.clearCommandDisplayWriter()
+      val task = Utils.streamProcessOutput(
+        cmd, List("8.8.8.8"), defaultTimeout){guiDisplayPW}
+      monitorFuture(task, "traceroute 8.8.8.8"){disp.setProcessStatusText}
+    }
+
+    val dmsegCommand = GUIUtils.makeCommand{
+      disp.clearCommandDisplayWriter()
+      val task = Utils.streamProcessOutput(
+        "dmesg", List("-T", "--level=err"), defaultTimeout){guiDisplayPW}
+      monitorFuture(task, "dmesg"){disp.setProcessStatusText}
+    }
+
     disp.setExitCommand(exitCmd)
     disp.setRefreshCommand(notImplmentedCmd)          
     disp.setOpenSiteCommand(openSiteCmd)
-      
+
+    disp.setPingHostCommand(pingCommand)
+    disp.setTracerouteCommand(tracerouteCommand)
+    disp.setDmesgCommand(dmsegCommand)      
  
     // disp.setIconImage(iconOnline)
     // State is true for Online and false for offline 
