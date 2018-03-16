@@ -102,6 +102,43 @@ object Utils{
     Await.result(fut, timeoutMs.milliseconds)
   }
 
+  /** Stream process or shell command to output in async mode (without
+     block current thread.)
+    */
+  def streamProcessOutput(
+    cmd:       String,
+    args:      List[String] = List(),
+    timeoutMs: Int = 5000
+    )(out: java.io.PrintWriter) = Future {
+    val pb = new java.lang.ProcessBuilder(cmd)
+    args foreach pb.command.add
+    val proc = pb.start()
+    //process = proc
+    val stdout = new java.util.Scanner(proc.getInputStream())
+    val stderr = new java.util.Scanner(proc.getErrorStream())
+    // Read process output in a new thread
+    val fut = Future {
+      while(stdout.hasNextLine())
+        out.println(stdout.nextLine())
+      while(stderr.hasNextLine())
+        out.println(stderr.nextLine())
+      out.println("Process ended with exit status = " + proc.exitValue())
+    }
+    // Monitor process thread waiting it finish until timeout is reached.
+    // If timeout is reached, kill the process.
+    try Await.result(fut, timeoutMs.milliseconds)
+    catch {
+      case ex: java.util.concurrent.TimeoutException
+          => {
+            proc.destroy()
+            out.println("\nProcess killed after timeout exceeded")
+          }
+    } finally {
+      stdout.close()
+      stderr.close()
+    }
+  }
+
 } // ---- End of object Utils ----- //
 
 
