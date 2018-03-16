@@ -136,6 +136,9 @@ object Utils{
     } finally {
       stdout.close()
       stderr.close()
+
+  val stdout = new java.io.PrintWriter(System.out, true)
+
     }
   }
 
