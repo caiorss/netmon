@@ -37,6 +37,18 @@ object Main{
   val iconOffline =
     Utils.getResourceImage("/resources/network-offline.png", getClass())
 
+  def monitorFuture[A](task: Future[A], command: String)(printer: String => Unit) = {
+    Future {
+      while(!task.isCompleted){
+        Thread.sleep(500)
+        printer(s"Status: Running $command ...")
+        Thread.sleep(500)
+        printer(s"Status: Running $command ... ...")
+      }
+      printer("Status: Process finished.")
+    }
+  }
+
   def main(args: Array[String]) = {
     val disp             = new Display(iconOnline)
     val exitCmd          = GUIUtils.makeCommand{ System.exit(1) }
