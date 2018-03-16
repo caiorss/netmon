@@ -159,16 +159,23 @@ object Utils{
     override def write(str: String) =
       buffer.append(str)
 
-    override def flush() = {
-      if(this.countLines() > maxLines)
-        buffer.clear()
-      ta.append(buffer.toString)
-      // Scroll to bottom
-      ta.setCaretPosition(ta.getDocument().getLength())
-    }
+    override def flush() =
+      javax.swing.SwingUtilities.invokeLater { () =>
+        ta.append(buffer.toString)
+        // Scroll to bottom
+        ta.setCaretPosition(ta.getDocument().getLength())
+      }
 
     // Don't do anything - dummy method
     override def close() = ()
+
+    def getPrinter() =
+      new java.io.PrintWriter(this, true)
+
+    def clear() = javax.swing.SwingUtilities.invokeLater { () =>
+      buffer.clear()
+      ta.setText("")
+    }
   }
 
   /** Create PrintWriter object out of a JTextArea object. */

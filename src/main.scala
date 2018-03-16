@@ -49,7 +49,7 @@ object Main{
     }
   }
 
-  val defaultTimeout = 30000
+  val defaultTimeout = 20000
 
   def main(args: Array[String]) = {
     val disp             = new Display(iconOnline)
@@ -76,6 +76,7 @@ object Main{
     val pingCommand = GUIUtils.makeCommand{
       // Address of Google's DNS = 8.8.8.8
       disp.clearCommandDisplayWriter()
+      println("Running ping")
       val task = Utils.streamProcessOutput(
         "ping", List("8.8.8.8"), timeoutMs = 5000){guiDisplayPW}
       monitorFuture(task, "ping 8.8.8.8"){disp.setProcessStatusText}
@@ -86,6 +87,7 @@ object Main{
         "tracert"
       else
         "traceroute"
+      println("Running traceroute")
       disp.clearCommandDisplayWriter()
       val task = Utils.streamProcessOutput(
         cmd, List("8.8.8.8"), defaultTimeout){guiDisplayPW}
@@ -93,6 +95,7 @@ object Main{
     }
 
     val dmsegCommand = GUIUtils.makeCommand{
+      println("Running dmesg")
       disp.clearCommandDisplayWriter()
       val task = Utils.streamProcessOutput(
         "dmesg", List("-T", "--level=err"), defaultTimeout){guiDisplayPW}

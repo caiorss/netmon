@@ -51,6 +51,8 @@ object GUIUtils{
 
 /** Main Graphical User Inteface */ 
 class Display(ico: java.awt.Image) extends javax.swing.JFrame{
+  import netmon.utils.Utils
+
   private val out               = new javax.swing.JTextArea()
   private val tray              = java.awt.SystemTray.getSystemTray()
   private val toolkit           = java.awt.Toolkit.getDefaultToolkit()
@@ -64,8 +66,9 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
   private val buttonTraceroute = new JButton("Traceroute 8.8.8.8")
   private val buttonDMSEG      = new JButton("Dmesg - [Unix]")
   private val buttonPingAddr   = new JButton("Ping 8.8.8.8")
-  private val commandOutput    = new javax.swing.JTextArea()
   private val processStatus    = new JLabel("Status: = ")
+  private val commandOutput    = new javax.swing.JTextArea()
+  private val cmdOutputWriter = new Utils.TextAreaWriter(this.commandOutput)
 
   import GUIUtils.Types.Command
 
@@ -135,7 +138,7 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
     frame.setIconImage(ico)
     // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     frame.getContentPane().setBackground(java.awt.Color.CYAN)
-    frame.setResizable(false)
+    // frame.setResizable(false)
 
 
     var flag = false
@@ -160,14 +163,16 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
   def setRefreshCommand(cmd: Command) =
     btnRefesh.addActionListener(cmd)
 
-  def clearCommandDisplayWriter() =
-    commandOutput.setText("")
+  def clearCommandDisplayWriter() = {
+    println("Clean display")
+    cmdOutputWriter.clear()
+  }
 
   def setProcessStatusText(text: String) =
     processStatus.setText(text)
 
   def getCommandDisplayWriter(): java.io.PrintWriter =
-    netmon.utils.Utils.makeTextAreaPW(this.commandOutput)
+    cmdOutputWriter.getPrinter()
 
   def setPingHostCommand(cmd: Command) =
     buttonPingAddr.addActionListener(cmd)
