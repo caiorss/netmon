@@ -117,13 +117,21 @@ object Utils{
     val stdout = new java.util.Scanner(proc.getInputStream())
     val stderr = new java.util.Scanner(proc.getErrorStream())
     // Read process output in a new thread
-    val fut = Future {
+    val futStdout = Future {
       while(stdout.hasNextLine())
         out.println(stdout.nextLine())
+    }
+
+    val futStderr = Future {
       while(stderr.hasNextLine())
         out.println(stderr.nextLine())
+    }
+
+    val fut = Future.sequence(List(futStdout, futStderr))
+    fut.onSuccess{ case res => 
       out.println("Process ended with exit status = " + proc.exitValue())
     }
+
     // Monitor process thread waiting it finish until timeout is reached.
     // If timeout is reached, kill the process.
     try Await.result(fut, timeoutMs.milliseconds)
