@@ -81,36 +81,48 @@ object Utils{
     Await.result(fut, timeoutMs.milliseconds)
   }
 
-  /** Stream process or shell command to output in async mode (without
-     block current thread.)
-    */
+  /** Stream process or shell command to output in async mode (without block current thread.)  */
   def streamProcessOutput(
-    cmd:       String,
-    args:      List[String] = List(),
-    timeoutMs: Int = 5000
-    )(out: java.io.PrintWriter) = Future {
-    val pb = new java.lang.ProcessBuilder(cmd)
-    args foreach pb.command.add
+                           command:   String,
+                           arguments: List[String] = List(),
+                           timeoutMs: Int          = 5000,
+                           debug:     Boolean      = false
+                          )(out: java.io.PrintWriter) = Future {
+    if(debug) println("Running command = " + command)
+
+    val pb = new java.lang.ProcessBuilder(command)
+    arguments foreach pb.command.add
     val proc = pb.start()
     //process = proc
     val stdout = new java.util.Scanner(proc.getInputStream())
     val stderr = new java.util.Scanner(proc.getErrorStream())
     // Read process output in a new thread
     val futStdout = Future {
-      while(stdout.hasNextLine())
-        out.println(stdout.nextLine())
+      if(debug) println("Start reading stdout lines")
+      while(stdout.hasNextLine()) {
+        val line = stdout.nextLine()
+        out.println(line)
+        if(debug) System.out.println(line)
+      }
+      if(debug) println("Finish reading stdout lines")
     }
 
     val futStderr = Future {
-      while(stderr.hasNextLine())
-        out.println(stderr.nextLine())
+      if(debug) println("Start reading stderr lines")
+      while(stderr.hasNextLine()){
+        val line = stderr.nextLine()
+        out.println(line)
+        if(debug) System.err.println(line)
+      }
+      if(debug) println("Finish reading stderr lines")
     }
 
     val fut = Future.sequence(List(futStdout, futStderr))
     fut.onSuccess{ case res => 
       out.println("Process ended with exit status = " + proc.exitValue())
     }
-
+    
+    if(debug) println("Waiting process output ...")
     // Monitor process thread waiting it finish until timeout is reached.
     // If timeout is reached, kill the process.
     try Await.result(fut, timeoutMs.milliseconds)
@@ -119,12 +131,14 @@ object Utils{
           => {
             proc.destroy()
             out.println("\nProcess killed after timeout exceeded")
+            if(debug) println(s"Process killed <$command> due to timeout expiration.")
           }
     } finally {
       stdout.close()
       stderr.close()
+      if(debug) println(s"End process <$command> execution")
     }
-  }
+  } // --- End of function streamProcessOutput --- //
 
   val stdout = new java.io.PrintWriter(System.out, true)
 
