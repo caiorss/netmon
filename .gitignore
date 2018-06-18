@@ -12,3 +12,4 @@ scratch/*
 project/*
 target/*
 docs/*
+.idea/*
