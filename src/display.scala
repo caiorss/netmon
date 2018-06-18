@@ -4,10 +4,17 @@ import javax.swing.{JPanel, JFrame, JButton, JLabel, JTabbedPane, JComponent}
 import java.awt.{BorderLayout, FlowLayout}
 
 
+/** Graphical user interface utilities */
 object GUIUtils{
 
   object Types{
     type Command = java.awt.event.ActionListener
+  }
+
+  /** Check if GUI is in design mode - for instance when running program in sbt */
+  def isDesignMode(): Boolean = {
+    val p = System.getProperty("gui.designmode")
+    p != null && p == "true"
   }
 
   def makeCommand(handler: => Unit) =     
@@ -15,7 +22,14 @@ object GUIUtils{
         def actionPerformed(evt: java.awt.event.ActionEvent) = {
           handler
         }
-      }    
+      }
+
+  /** Note the ExitCommand doesn't work when the program is in design mode
+    * The program is running in design mode when the property gui.designmode is set to 'true'
+    * */
+  val ExitCommand = makeCommand{
+    if(!isDesignMode()) System.exit(0)
+  }
 
   def onClick(button: JButton) (handler: => Unit) = {
     button.addActionListener(
@@ -151,7 +165,8 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
     }
     icon.addActionListener(listener)
 
-    //frame.setVisible(true)
+    if(GUIUtils.isDesignMode())
+      frame.setVisible(true)
   } // --- EOF method init() ---- //
 
   def setExitCommand(cmd: Command) =
