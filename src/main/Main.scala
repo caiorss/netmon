@@ -10,7 +10,7 @@ import scala.concurrent.duration._
 import netmon.utils.{Utils, NetInfo}
 
 // file: display.scala 
-import netmon.display.{Display, GUIUtils}
+import netmon.gui.{Display, GUIUtils}
 
 /** Program Entry Point */
 object Main{
