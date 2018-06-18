@@ -3,7 +3,7 @@
 SHORT_DESCRIPTION="Netmon - network monitor"
 APPNAME=netmon
 TEMPFILE=/tmp/installer-app.desktop
-BINARY=./bin/netmon-guard.jar
+BINARY=./netmon-uber.jar
 DEST=~/opt/jarapps/$APPNAME
 DESTFILE=netmon.jar 
 ICON=./resources/network-online.jpg
