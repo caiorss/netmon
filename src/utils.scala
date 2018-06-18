@@ -248,7 +248,7 @@ object NetInfo{
     }
   }
 
-  def checkHTTP(hostname: String, address: String)(handler: (Boolean, String) => Unit) = { 
+  def checkHTTP(hostname: String, address: String, port: Int = 8080)(handler: (Boolean, String) => Unit) = {
     val fut = Future{checkHTTPSync(hostname)}
     try {
       Await.result(fut, 4.second)
@@ -257,7 +257,7 @@ object NetInfo{
       case ex: java.net.UnknownHostException
           => try {
             // address of www.google.com = 216.58.222.100
-            if(isPortOpen(address, 80))
+            if(isPortOpen(address, port = port))
               handler(false, "Error: DNS Failure, but can connect to probe address")
             else 
               handler(false, "Error: DNS Failure")
