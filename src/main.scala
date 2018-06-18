@@ -37,6 +37,7 @@ object Main{
   val iconOffline =
     Utils.getResourceImage("/icons/network-offline.png", getClass())
 
+
   def monitorFuture[A](task: Future[A], command: String)(printer: String => Unit) = {
     Future {
       while(!task.isCompleted){
@@ -52,6 +53,7 @@ object Main{
   val defaultTimeout = 20000
 
   def main(args: Array[String]) = {
+    // ---- High level GUI Commands ----- //
     val disp             = new Display(iconOnline)
     val exitCmd          = GUIUtils.makeCommand{ System.exit(0) }    
     val notImplmentedCmd = GUIUtils.makeCommand{
@@ -102,7 +104,7 @@ object Main{
       monitorFuture(task, "dmesg"){disp.setProcessStatusText}
     }
 
-    disp.setExitCommand(exitCmd)
+    disp.setExitCommand(GUIUtils.ExitCommand)
     disp.setRefreshCommand(notImplmentedCmd)          
     disp.setOpenSiteCommand(openSiteCmd)
 
