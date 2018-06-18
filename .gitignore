@@ -8,3 +8,7 @@ lib/*
 *.bin
 *.tgz
 
+scratch/*
+project/*
+target/*
+docs/*
