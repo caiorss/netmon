@@ -10,6 +10,7 @@ object GUIUtils{
     type Command = java.awt.event.ActionListener
   }
 
+  import Types.Command
 
   /** Check if GUI is in design mode - for instance when running program in sbt */
   def isDesignMode(): Boolean = {
@@ -17,7 +18,7 @@ object GUIUtils{
     p != null && p == "true"
   }
 
-  def makeCommand(handler: => Unit) =
+  def makeCommand(handler: => Unit) : Command =
       new java.awt.event.ActionListener(){
         def actionPerformed(evt: java.awt.event.ActionEvent) = {
           handler
@@ -57,12 +58,13 @@ object GUIUtils{
   /** Note the ExitCommand doesn't work when the program is in design mode
     * The program is running in design mode when the property gui.designmode is set to 'true'
     * */
-  val ExitCommand = makeCommand{
-    if(!isDesignMode())
-      System.exit(0)
-    else
-      showWarning(title = "Error report", message = "Error: it doesn't work on design mode.")
-  }
+   def makeExitCommand(frame: javax.swing.JFrame = null) : Command =
+     makeCommand{
+      if(!isDesignMode())
+        System.exit(0)
+      else
+        showWarning(title = "Error report", message = "Error: it doesn't work on design mode.", frame = frame)
+    }
 
 
 }

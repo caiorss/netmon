@@ -53,9 +53,11 @@ object Main{
   val defaultTimeout = 20000
 
   def main(args: Array[String]) = {
+
     // ---- High level GUI Commands ----- //
+    //
     val disp             = new Display(iconOnline)
-    val exitCmd          = GUIUtils.makeCommand{ System.exit(0) }    
+    val exitCmd          = GUIUtils.makeExitCommand(disp)
     val notImplmentedCmd = GUIUtils.makeCommand{
       GUIUtils.showWarning("Error: Command not implemented", frame = disp)
     }
@@ -104,14 +106,16 @@ object Main{
       monitorFuture(task, "dmesg"){disp.setProcessStatusText}
     }
 
-    disp.setExitCommand(GUIUtils.ExitCommand)
+    //---------------- Set display commands --------------------
+    //
+    disp.setExitCommand(exitCmd)
     disp.setRefreshCommand(notImplmentedCmd)          
     disp.setOpenSiteCommand(openSiteCmd)
-
     disp.setPingHostCommand(pingCommand)
     disp.setTracerouteCommand(tracerouteCommand)
     disp.setDmesgCommand(dmsegCommand)      
- 
+
+
     // disp.setIconImage(iconOnline)
     // State is true for Online and false for offline 
     var state = true 
