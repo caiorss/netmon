@@ -47,6 +47,10 @@ scalaSource in Test := { (baseDirectory in Test)(_ / "test") }.value
 // Move resource directory from ./src/main/resources to ./resources
 resourceDirectory in Compile := baseDirectory.value / "resources"
 
+
+initialize := { System.setProperty("gui.designmode", "true") }
+
+
 //============= Customs SBT tasks ===================== //
 //
 //
