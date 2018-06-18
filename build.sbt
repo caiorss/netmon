@@ -1,3 +1,5 @@
+import sbt.Package.ManifestAttributes
+
 // Scala runtime and distribution version
 scalaVersion := "2.12.6"
 
@@ -14,6 +16,17 @@ description          := "Network monitor written in Scala."
 mainClass in Compile := Some("netmon.main.Main")
 // DO NOT add scala version to the produced artifacts
 crossPaths := false
+
+// Set contents of manifest file => META-INF/MANIFEST.INF
+// Reference: https://github.com/sbt/sbt-assembly/issues/80
+packageOptions in assembly := Seq(ManifestAttributes(
+  ("Main-Class",             "netmon.main.Main"),
+  ("Built-By",               "dummy team"),
+  ("Implementation-Title",   "Network Monitor"),
+  ("Implementation-Version", "1.0"))
+)
+
+mergeStrategy in assembly := { case _ => MergeStrategy.first }
 
 //============= Dependencies ================================================
 //
@@ -80,4 +93,62 @@ copyUber := {
 }
 
 
+//================ Plugins =========================//
 
+// Proguard 
+//  -> See:
+//  + https://github.com/sbt/sbt-proguard/issues/27
+//  + https://www.scala-sbt.org/sbt-native-packager/recipes/custom.html
+//  + https://github.com/sbt/sbt-proguard/issues/2
+//  + https://stackoverflow.com/questions/29055544/sbt-proguard-issue-with-java-1-8
+//  + https://stackoverflow.com/questions/39655207/how-to-obfuscate-fat-scala-jar-with-proguard-and-sbt
+//  + https://ask.helplib.com/java/post_1389823
+//  + https://dvcs.w3.org/hg/read-write-web/file/aa9074df0635/project/build.scala
+//  + 
+// 
+enablePlugins(SbtProguard)
+// ProguardKeys.proguardVersion in Proguard := "5.2.1"
+// javaOptions in (Proguard, ProguardKeys.proguard) := Seq("-Xmx2G")
+// javaOptions in (Proguard, ProguardKeys.proguard) += Seq("-Xss1G")
+exportJars := true
+proguardMerge in Proguard := false
+proguardOptions in Proguard ++= Seq(
+  "-dontnote", "-dontwarn", "-ignorewarnings",
+  "-dontoptimize",
+  // "-dontobfuscate",
+
+  // Reference: http://stackoverflow.org.cn/front/ask/view?ask_id=127610
+  "-optimizationpasses 5",
+  "-optimizations !code/allocation/variable",
+
+
+  "-keepclasseswithmembers public class * { public static void main(java.lang.String[]); }",
+  "-keep class scala.collection.SeqLike { public protected *;} ",
+
+  // "-keep interface java8.** { *; }",
+  // "-keep class java8.** { *; }",
+
+  // "-keepattributes Signature",
+  // "-keepattributes *Annotation*",
+  // "-keepattributes InnerClasses",
+  // "-keepattributes SourceFile",
+  // "-keepattributes LineNumberTable",
+
+  //----------------------------------
+
+  // "-keepattributes Annotation", 
+  // "-keepattributes EnclosingMethod,InnerClasses,Signature",
+  // "-keep class scala.ScalaObject { *; }",
+  // "-keep class scala.Symbol { *; }",
+
+)
+
+proguardInputFilter in Proguard := { file =>
+  file.name match {
+    case "scala-library.jar" => Some("!META-INF/**")
+    case _                   => None
+  }
+}
+
+proguardMerge in Proguard := true
+proguardOptions in Proguard += ProguardOptions.keepMain("netmon.main.Main")
