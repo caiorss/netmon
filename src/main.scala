@@ -32,10 +32,10 @@ object Main{
   )
 
   val iconOnline  =
-    Utils.getResourceImage("/resources/network-online.jpg", getClass())
+    Utils.getResourceImage("/icons/network-online.jpg", getClass())
 
   val iconOffline =
-    Utils.getResourceImage("/resources/network-offline.png", getClass())
+    Utils.getResourceImage("/icons/network-offline.png", getClass())
 
   def monitorFuture[A](task: Future[A], command: String)(printer: String => Unit) = {
     Future {
