@@ -82,7 +82,11 @@ object Main{
       disp.clearCommandDisplayWriter()
       println("Running ping")
       val task = Utils.streamProcessOutput(
-        "ping", List("8.8.8.8"), timeoutMs = 5000){guiDisplayPW}
+        command    ="ping",
+        arguments = List("8.8.8.8"),
+        timeoutMs = 5000,
+        debug     = GUIUtils.isDesignMode()
+      ){guiDisplayPW}
       monitorFuture(task, "ping 8.8.8.8"){disp.setProcessStatusText}
     }
 
@@ -94,7 +98,11 @@ object Main{
       println("Running traceroute")
       disp.clearCommandDisplayWriter()
       val task = Utils.streamProcessOutput(
-        cmd, List("8.8.8.8"), defaultTimeout){guiDisplayPW}
+        cmd,
+        List("8.8.8.8"),
+        defaultTimeout,
+        debug = GUIUtils.isDesignMode()
+      ){guiDisplayPW}
       monitorFuture(task, "traceroute 8.8.8.8"){disp.setProcessStatusText}
     }
 
