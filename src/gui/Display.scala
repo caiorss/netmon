@@ -23,6 +23,7 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
   private val buttonTraceroute = new JButton("Traceroute 8.8.8.8")
   private val buttonDMSEG      = new JButton("Dmesg - [Unix]")
   private val buttonPingAddr   = new JButton("Ping 8.8.8.8")
+  private val btnRestart    = new JButton("Restart")
   private val processStatus    = new JLabel("Status: = ")
   private val commandOutput    = new javax.swing.JTextArea()
   private val cmdOutputWriter = new Utils.TextAreaWriter(this.commandOutput)
@@ -51,6 +52,7 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
     buttonPane.setBackground(bgColor)
     buttonPane.add(btnRefesh)
     buttonPane.add(btnOpenRouterSite)
+    buttonPane.add(btnRestart)
     buttonPane.add(btnExit)
 
     panelStatus.add(buttonPane, BorderLayout.NORTH)
@@ -60,7 +62,7 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
     btnRefesh.setBackground(bgColor)
     btnOpenRouterSite.setBackground(bgColor)
     btnExit.setBackground(bgColor)
-
+    btnRestart.setBackground(bgColor)
 
     //---- Tools Pane -----------------------//
     val paneTools = GUIUtils.makeTextPanel("Network Tools")
@@ -140,6 +142,9 @@ class Display(ico: java.awt.Image) extends javax.swing.JFrame{
 
   def setDmesgCommand(cmd: Command) =
     buttonDMSEG.addActionListener(cmd)
+
+  def setRestartCommand(cmd: Command) =
+    btnRestart.addActionListener(cmd)
 
   def display(msg: String) =
     out.setText(msg)

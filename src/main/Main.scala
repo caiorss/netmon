@@ -121,7 +121,8 @@ object Main{
     disp.setOpenSiteCommand(openSiteCmd)
     disp.setPingHostCommand(pingCommand)
     disp.setTracerouteCommand(tracerouteCommand)
-    disp.setDmesgCommand(dmsegCommand)      
+    disp.setDmesgCommand(dmsegCommand)
+    disp.setRestartCommand(GUIUtils.restartCommand)
 
 
     // disp.setIconImage(iconOnline)
