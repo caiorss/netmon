@@ -58,7 +58,7 @@ object GUIUtils{
   /** Note the ExitCommand doesn't work when the program is in design mode
     * The program is running in design mode when the property gui.designmode is set to 'true'
     * */
-   def makeExitCommand(frame: javax.swing.JFrame = null) : Command =
+  def makeExitCommand(frame: javax.swing.JFrame = null) : Command =
      makeCommand{
       if(!isDesignMode())
         System.exit(0)
@@ -66,5 +66,22 @@ object GUIUtils{
         showWarning(title = "Error report", message = "Error: it doesn't work on design mode.", frame = frame)
     }
 
+  val restartCommand : Command = makeCommand{
+    import java.io.File
+    val sep = File.separator
+    val javaProgram = System.getProperty("java.home") + sep + "bin" + sep + "java"
+    val thisJar     = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI)
+    val command = new java.util.ArrayList[String]()
+    // println("Java program = " + javaProgram)
+    // println("Thisjar      = " + thisJar)
+    command.add(javaProgram)
+    command.add("-jar")
+    command.add(thisJar.getPath)
+    val builder = new ProcessBuilder(command)
+    Thread.sleep(200)
+    builder.start()
+    Thread.sleep(200)
+    System.exit(0)
+  }
 
 }
