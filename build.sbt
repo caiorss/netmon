@@ -4,6 +4,16 @@ import sbt.Package.ManifestAttributes
 scalaVersion := "2.12.6"
 
 // import sbt.project
+/* Prevents the command $ run in sbt shell from quitting the sbt shell when user hits Ctrl + C
+ * Reference:
+ *  + https://underscore.io/blog/posts/2015/11/09/sbt-commands.html
+ *  + https://github.com/sbt/sbt/issues/2622
+ *  +
+ */
+cancelable in Global := true
+fork in run          := true
+fork in Test         := true
+
 
 //============ Application Specific Settings ===============
 // Application/Program name 
@@ -26,7 +36,7 @@ packageOptions in assembly := Seq(ManifestAttributes(
   ("Implementation-Version", "1.0"))
 )
 
-mergeStrategy in assembly := { case _ => MergeStrategy.first }
+// mergeStrategy in assembly := { case _ => MergeStrategy.first }
 
 //============= Dependencies ================================================
 //
